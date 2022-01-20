@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.mods.Chassis;
+import org.firstinspires.ftc.teamcode.mods.DriverBase;
 
 @Config
 @TeleOp
-public class Telecontrol extends Chassis {
+public class Telecontrol extends DriverBase {
     public static double p = 0.01, i = 0.01, de_i = 0.5, d = 0.01;
     private double r_suck;
     private boolean l_gpa;

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Config
-public abstract class Chassis extends LinearOpMode {
+public abstract class DriverBase extends LinearOpMode {
     public double max_Acceleration = 0.05, critical_Speed = 0.04;
     private double current_X, current_Y, current_Direction;
     protected Wheel forward_Left, rear_Left, forward_Right, rear_Right;
