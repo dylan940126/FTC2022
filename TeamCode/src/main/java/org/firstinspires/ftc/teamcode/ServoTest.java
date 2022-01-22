@@ -1,23 +1,23 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 @TeleOp
 public class ServoTest extends OpMode {
+    public static double position = 0;
     private Servo servo;
 
     @Override
     public void init() {
-        servo = hardwareMap.get(Servo.class, "s1");
+        servo = hardwareMap.get(Servo.class, "lock");
     }
 
     @Override
     public void loop() {
-        if (gamepad1.left_bumper)
-            servo.setPosition(0);
-        else if (gamepad1.right_bumper)
-            servo.setPosition(1);
+        servo.setPosition(position);
     }
 }
