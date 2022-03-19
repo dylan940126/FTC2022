@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.custommodules.DriverBase;
 import org.firstinspires.ftc.teamcode.custommodules.MyMath;
 
 @Autonomous
-public class BlueZone extends LinearOpMode {
+public class RedZone extends LinearOpMode {
     DriverBase driverBase = new DriverBase(this);
     double time;
 
@@ -41,7 +41,7 @@ public class BlueZone extends LinearOpMode {
             driverBase.turntable.collect();
             driverBase.chassis.move_to(-((i % 2) * 8 + 3), 9 + i * 3, 0, 0.5);
             while (opModeIsActive() && !driverBase.turntable.isCarry())
-                driverBase.chassis.drive(0, 0.2, Math.cos((getRuntime() - time) * 2 * Math.PI / 1.5), 0.2);
+                driverBase.chassis.drive(0, 0.2, Math.cos((getRuntime() - time) * 2 * Math.PI / 1.5), 0.1);
             driverBase.turntable.backFlow();
             driverBase.chassis.move_to(1.5, 0, 0.2, 1);
             if (getRuntime() > 26)

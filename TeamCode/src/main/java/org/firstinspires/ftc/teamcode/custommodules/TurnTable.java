@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.custommodules;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -11,55 +10,55 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class TurnTable {
     private final LinearOpMode opMode;
     private final DcMotor raise, extend, intake, spinner;
-    private final CRServo turn;
-    private final Servo container, lock, ship;
+    private final Servo container, ship;
     private final DistanceSensor object_detector;
     private boolean last_direction, last_detect = false;
     private double last_turn_time, detect_time = 0;
 
     public TurnTable(LinearOpMode opMode) {
         this.opMode = opMode;
-        raise = opMode.hardwareMap.dcMotor.get("la");
-        raise.setPower(-0.2);
-        opMode.sleep(500);
-        raise.setPower(0);
-        raise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extend = opMode.hardwareMap.dcMotor.get("extend");
-        extend.setDirection(DcMotor.Direction.REVERSE);
-        extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intake = opMode.hardwareMap.dcMotor.get("intake");
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        spinner = opMode.hardwareMap.dcMotor.get("spinner");
-        ship = opMode.hardwareMap.servo.get("shipping");
-        turn = opMode.hardwareMap.crservo.get("btm");
-        lock = opMode.hardwareMap.servo.get("lock");
         container = opMode.hardwareMap.servo.get("lifter");
-        setContainer(false);
+        noPour();
+        intake = opMode.hardwareMap.dcMotor.get("intake");
+        intake.setDirection(DcMotor.Direction.REVERSE);
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        turn = opMode.hardwareMap.dcMotor.get("btm");
+//        turn.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        turn.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        turn.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        spinner = opMode.hardwareMap.dcMotor.get("spinner");
+        ship = opMode.hardwareMap.servo.get("ship");
+        ship.setDirection(Servo.Direction.REVERSE);
+        ship.scaleRange(0, 0.94);
         object_detector = opMode.hardwareMap.get(DistanceSensor.class, "objdetect");
         last_direction = false;
         last_turn_time = opMode.getRuntime();
+        raise = opMode.hardwareMap.dcMotor.get("la");
+        raise.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extend = opMode.hardwareMap.dcMotor.get("extend");
+        extend.setDirection(DcMotor.Direction.REVERSE);
+        extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        resetRaise();
     }
 
     public void setDirection(boolean left) {
-        if (last_direction ^ left) {
-            lock.setPosition(0.6);
-            turn.setPower(left ? -1 : 1);
-            last_direction = left;
-            last_turn_time = opMode.getRuntime();
-        } else if (opMode.getRuntime() - last_turn_time > 1.5) {
-            lock.setPosition(0.47);
-            turn.setPower(0);
-        }
     }
 
-    public void Collect() {
-        intake.setPower(0.7);
+//    public void setTurn(double power) {
+//        turn.setPower(power);
+//    }
+
+    public void shipPosition(double position) {
+        ship.setPosition(position);
+    }
+
+    public void collect() {
+        if (isCollectable())
+            intake.setPower(0.8);
     }
 
     public void backFlow() {
-        intake.setPower(-0.8);
+        intake.setPower(-1);
     }
 
     public void stopCollect() {
@@ -69,36 +68,90 @@ public class TurnTable {
     public void setHeight(int height) {
         switch (height) {
             case 0:
-                raise.setTargetPosition(0);
+                extend.setTargetPosition(0);
+                if (extend.getCurrentPosition() < 200)
+                    raise.setTargetPosition(250);
+                extend.setPower(1);
+                extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 break;
             case 1:
-                raise.setTargetPosition(900);
+                raise.setTargetPosition(450);
+                extend.setTargetPosition(1690);
+                extend.setPower(1);
+                extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 break;
             case 2:
-                raise.setTargetPosition(1100);
+                raise.setTargetPosition(780);
+                extend.setTargetPosition(1790);
+                extend.setPower(1);
+                extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                break;
+            case 3:
+                raise.setTargetPosition(1050);//1150
+                extend.setTargetPosition(1900);
+                extend.setPower(1);
+                extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                break;
+            case 4:
+                raise.setTargetPosition(500);
+                break;
+            default:
                 break;
         }
-        raise.setPower(0.5);
+        raise.setPower(1);
         raise.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void setExtendSpeed(double speed) {
-        extend.setPower(0.4 * speed);
+    public void setExtendSpeed(double power) {
+        extend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (power < 0 || extend.getCurrentPosition() < 1900)
+            extend.setPower(power);
+        else
+            extend.setPower(0);
     }
 
-    public void setContainer(boolean pour) {
-        container.setPosition(pour ? 0.55 : 1);
+    public void pour() {
+        container.setPosition(0.3);
+    }
+
+    public void noPour() {
+        container.setPosition(1);
     }
 
     public boolean isCarry() {
-        boolean now_detect = object_detector.getDistance(DistanceUnit.CM) < 13;
+        opMode.telemetry.addData("dist", object_detector.getDistance(DistanceUnit.CM));
+        if (!isCollectable())
+            return last_detect;
+        boolean now_detect = object_detector.getDistance(DistanceUnit.CM) < 15;
         if (!last_detect && now_detect)
             detect_time = opMode.getRuntime();
         last_detect = now_detect;
-        return now_detect && (opMode.getRuntime() - detect_time) > 0.5;
+        return now_detect && (opMode.getRuntime() - detect_time) > 0.15;
+    }
+
+    public boolean isCollectable() {
+        return raise.getCurrentPosition() < 300 && extend.getCurrentPosition() < 100;
+    }
+
+    public boolean isPourable() {
+        return extend.getCurrentPosition() > 1400;
     }
 
     public void setSpinner(double power) {
         spinner.setPower(power);
+    }
+
+    public void resetRaise() {
+        extend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        raise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        extend.setPower(-0.5);
+        raise.setPower(-0.5);
+        opMode.sleep(1000);
+        extend.setPower(0);
+        raise.setPower(0);
+        opMode.sleep(200);
+        extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        raise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setHeight(0);
     }
 }
