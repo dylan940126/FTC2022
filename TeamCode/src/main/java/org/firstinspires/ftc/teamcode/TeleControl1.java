@@ -62,7 +62,7 @@ public class TeleControl1 extends LinearOpMode {
                 take.reset(false);
             driverBase.turntable.setHeight(height);
             if (height != 0)
-                d_forward = MyMath.distanceToPower(driverBase.redGoalPipeline.getX()) / 70;
+                d_forward = MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 70;
             else
                 d_forward = 0;
 //            底盤1

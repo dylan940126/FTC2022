@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.custommodules;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,9 +20,9 @@ public class Chassis extends Thread {
             code_per_inch_right = 55.387,
             code_per_inch_forward = 50,
             turn_weight = 10,
-            k_turn = 0.99580306216888673256011948485903,
             trace_kp = 0.18;
-    private double last_refresh_time, loop_time = 0, current_x, current_y, current_direction;
+    private double last_refresh_time, loop_time = 0;
+    public double current_x, current_y, current_direction;
     private Orientation last_direction;
     private final LinearOpMode opMode;
 
@@ -68,7 +70,15 @@ public class Chassis extends Thread {
         drive(rightSpeed, forwardSpeed, turnSpeed, speed);
     }
 
+    public interface Period {
+        boolean execute();
+    }
+
     public void move_to(double target_X, double target_Y, double target_Direction, double maxSpeed) {
+        move_to(target_X, target_Y, target_Direction, maxSpeed, null);
+    }
+
+    public void move_to(double target_X, double target_Y, double target_Direction, double maxSpeed, Period period) {
         double total_X = target_X - current_x;
         double total_Y = target_Y - current_y;
         double total_Direction = target_Direction - current_direction;
@@ -77,11 +87,18 @@ public class Chassis extends Thread {
         double totalTime = Math.min(Math.sqrt(distance / max_accelerate / 2), distance / maxSpeed / 2) * Math.PI;
         double incomplete_Rate = 0;
         double error = distance;
-        while (opMode.opModeIsActive() && (opMode.getRuntime() - startTime) < totalTime + 1.5 && (incomplete_Rate > 0 || error > 1)) {
+        if (period == null)
+            period = () -> true;
+        while (opMode.opModeIsActive()
+                && period.execute()
+                && (opMode.getRuntime() - startTime) < totalTime + 1.5
+                && (incomplete_Rate > 0 || error > 1)) {
+
             incomplete_Rate = (opMode.getRuntime() - startTime) <= totalTime ? (Math.cos(Math.PI * (opMode.getRuntime() - startTime) / totalTime) + 1) / 2 : 0;
             double error_X = target_X - total_X * incomplete_Rate - current_x;
             double error_Y = target_Y - total_Y * incomplete_Rate - current_y;
             double error_direction = target_Direction - total_Direction * incomplete_Rate - current_direction;
+
             error_direction *= turn_weight;
             error = Math.sqrt(error_X * error_X + error_Y * error_Y + error_direction * error_direction);
             move(error_X, error_Y, error_direction, MyMath.distanceToPower(error) * trace_kp);
@@ -106,17 +123,19 @@ public class Chassis extends Thread {
         rf.refresh();
         rb.refresh();
         Orientation now_direction = imu.getAngularOrientation();
+
         double d_right = (lf.getSpeed() - lb.getSpeed() - rf.getSpeed() + rb.getSpeed()) / 4 * loop_time / code_per_inch_right;
         double d_forward = (lf.getSpeed() + lb.getSpeed() + rf.getSpeed() + rb.getSpeed()) / 4 * loop_time / code_per_inch_forward;
-        double d_turn = (now_direction.firstAngle - last_direction.firstAngle) * k_turn;
+        double d_turn = now_direction.firstAngle - last_direction.firstAngle;
         if (d_turn < -Math.PI)
             d_turn += 2 * Math.PI;
         else if (d_turn > Math.PI)
             d_turn -= 2 * Math.PI;
         last_direction = now_direction;
-        current_direction += d_turn;
+
         current_x += d_right * Math.cos(current_direction) - d_forward * Math.sin(current_direction);
         current_y += d_right * Math.sin(current_direction) + d_forward * Math.cos(current_direction);
+        current_direction += d_turn;
         opMode.telemetry.addData("currentX", current_x);
         opMode.telemetry.addData("currentY", current_y);
         opMode.telemetry.addData("currentDirection", current_direction);

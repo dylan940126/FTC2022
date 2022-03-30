@@ -16,17 +16,18 @@ public class BlueZone extends LinearOpMode {
         driverBase.initDevices();
         driverBase.switchToDockPipeline();
         while (!isStarted()) {
-            telemetry.addData("position", driverBase.duckPosition.getPosition());
+            telemetry.addData("position", driverBase.levelPipeline.getLevel());
             telemetry.update();
         }
         resetStartTime();
-        driverBase.turntable.setHeight(driverBase.duckPosition.getPosition());
+        driverBase.turntable.setHeight(driverBase.levelPipeline.getLevel());
         driverBase.switchToGoalPipeline();
+        driverBase.hubPipeline.setToBlue();
         driverBase.chassis.drive(0.1, -1, 0.1, 0.9);
         sleep(500);
         driverBase.chassis.drive(0, 0, 0, 0);
-        while (Math.abs(driverBase.redGoalPipeline.getX()) >= 5 && opModeIsActive())
-            driverBase.chassis.drive(0.3, driverBase.redGoalPipeline.getX(), 0, 0.3 + Math.abs(MyMath.distanceToPower(driverBase.redGoalPipeline.getX()) / 50));
+        while (Math.abs(driverBase.hubPipeline.getX()) >= 5 && opModeIsActive())
+            driverBase.chassis.drive(0.3, driverBase.hubPipeline.getX(), 0, 0.3 + Math.abs(MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 50));
         driverBase.chassis.drive(0, 0, 0, 0);
         driverBase.turntable.pour();
         sleep(700);
@@ -62,8 +63,8 @@ public class BlueZone extends LinearOpMode {
             time = getRuntime();
             while (opModeIsActive() && getRuntime() - time < 1.5 && !driverBase.turntable.isCarry()) {
                 driverBase.chassis.drive(0.3,
-                        Math.abs(MyMath.distanceToPower(driverBase.redGoalPipeline.getX()) / 50), 0,
-                        Math.abs(MyMath.distanceToPower(driverBase.redGoalPipeline.getX()) / 50) + 0.2);
+                        Math.abs(MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 50), 0,
+                        Math.abs(MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 50) + 0.2);
                 if (driverBase.turntable.isCarry()) {
                     driverBase.turntable.setHeight(3);
                     driverBase.turntable.backFlow();
@@ -74,8 +75,8 @@ public class BlueZone extends LinearOpMode {
                 continue;
             time = getRuntime();
             while (opModeIsActive() && getRuntime() - time < 0.5) {
-                driverBase.chassis.drive(0, driverBase.redGoalPipeline.getX(), 0, Math.abs(MyMath.distanceToPower(driverBase.redGoalPipeline.getX()) / 50));
-                if (Math.abs(driverBase.redGoalPipeline.getX()) < 20 && driverBase.turntable.isPourable())
+                driverBase.chassis.drive(0, driverBase.hubPipeline.getX(), 0, Math.abs(MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 50));
+                if (Math.abs(driverBase.hubPipeline.getX()) < 20 && driverBase.turntable.isPourable())
                     driverBase.turntable.pour();
                 else
                     time = getRuntime();

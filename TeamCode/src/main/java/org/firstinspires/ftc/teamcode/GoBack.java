@@ -15,7 +15,7 @@ public class GoBack extends LinearOpMode {
         driverBase.initDevices();
         driverBase.switchToDockPipeline();
         waitForStart();
-        driverBase.turntable.setHeight(driverBase.duckPosition.getPosition());
+        driverBase.turntable.setHeight(driverBase.levelPipeline.getLevel());
         driverBase.chassis.drive(0, -1, 0, 0.7);
         sleep(530);
         driverBase.chassis.drive(0, 0, 0, 0);
