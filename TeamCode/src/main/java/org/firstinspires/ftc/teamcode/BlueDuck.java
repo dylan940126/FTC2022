@@ -13,13 +13,13 @@ public class BlueDuck extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         driverBase.initDevices();
-        driverBase.turntable.setHeight(driverBase.duckPosition.getPosition());
+        driverBase.turntable.setHeight(driverBase.levelPipeline.getLevel());
         driverBase.switchToGoalPipeline();
         driverBase.chassis.drive(0.1, -1, 0.1, 0.9);
         sleep(500);
         driverBase.chassis.drive(0, 0, 0, 0);
-        while (Math.abs(driverBase.redGoalPipeline.getX()) >= 5 && opModeIsActive())
-            driverBase.chassis.drive(0.3, driverBase.redGoalPipeline.getX(), 0, 0.3 + Math.abs(MyMath.distanceToPower(driverBase.redGoalPipeline.getX()) / 50));
+        while (Math.abs(driverBase.hubPipeline.getX()) >= 5 && opModeIsActive())
+            driverBase.chassis.drive(0.3, driverBase.hubPipeline.getX(), 0, 0.3 + Math.abs(MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 50));
         driverBase.chassis.drive(0, 0, 0, 0);
         driverBase.turntable.pour();
         sleep(700);

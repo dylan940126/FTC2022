@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.custommodules;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -13,9 +15,9 @@ public class TurnTable {
     private final Servo container, ship;
     private final DistanceSensor object_detector;
     private boolean last_direction, last_detect = false;
-    private double last_turn_time, detect_time = 0;
+    private double detect_time = 0;
 
-    public TurnTable(LinearOpMode opMode) {
+    public TurnTable(@NonNull LinearOpMode opMode) {
         this.opMode = opMode;
         container = opMode.hardwareMap.servo.get("lifter");
         noPour();
@@ -32,7 +34,6 @@ public class TurnTable {
         ship.scaleRange(0, 0.94);
         object_detector = opMode.hardwareMap.get(DistanceSensor.class, "objdetect");
         last_direction = false;
-        last_turn_time = opMode.getRuntime();
         raise = opMode.hardwareMap.dcMotor.get("la");
         raise.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend = opMode.hardwareMap.dcMotor.get("extend");
@@ -40,13 +41,6 @@ public class TurnTable {
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         resetRaise();
     }
-
-    public void setDirection(boolean left) {
-    }
-
-//    public void setTurn(double power) {
-//        turn.setPower(power);
-//    }
 
     public void shipPosition(double position) {
         ship.setPosition(position);
@@ -87,7 +81,7 @@ public class TurnTable {
                 extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 break;
             case 3:
-                raise.setTargetPosition(1050);//1150
+                raise.setTargetPosition(1050);
                 extend.setTargetPosition(1900);
                 extend.setPower(1);
                 extend.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -104,7 +98,7 @@ public class TurnTable {
 
     public void setExtendSpeed(double power) {
         extend.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        if (power < 0 || extend.getCurrentPosition() < 1900)
+        if (power < 0 || extend.getCurrentPosition() < 1950)
             extend.setPower(power);
         else
             extend.setPower(0);
