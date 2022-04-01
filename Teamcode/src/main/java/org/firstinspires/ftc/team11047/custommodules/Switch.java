@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.custommodules;
+package org.firstinspires.ftc.team11047.custommodules;
 
 public class Switch {
     private boolean last_state, current_state, press, on;

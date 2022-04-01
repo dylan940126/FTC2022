@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team11047;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.custommodules.DriverBase;
-import org.firstinspires.ftc.teamcode.custommodules.Switch;
+import org.firstinspires.ftc.team11047.custommodules.DriverBase;
+import org.firstinspires.ftc.team11047.custommodules.Switch;
 
 @Config
 @TeleOp
@@ -42,12 +42,12 @@ public class TeleControl2 extends LinearOpMode {
                 driverBase.turntable.noPour();
 //            鴨子
             if (gamepad2.b)
-                driverBase.turntable.setSpinner(Math.min(getRuntime() - duck_power, 1) * 0.4);
+                driverBase.turntable.setSpinnerRed();
             else if (gamepad2.x)
-                driverBase.turntable.setSpinner(Math.min(getRuntime() - duck_power, 1) * -0.4);
+                driverBase.turntable.setSpinnerBlue();
             else {
                 duck_power = getRuntime();
-                driverBase.turntable.setSpinner(0);
+                driverBase.turntable.setSpinnerStop();
             }
 //            手臂2
             raise_level.refresh(gamepad2.left_bumper);

@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.easyopencv;
+package org.firstinspires.ftc.team11047.easyopencv;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -11,13 +10,14 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 @Config
-public class DuckPosition extends OpenCvPipeline {
+public class DuckPipeline extends OpenCvPipeline {
     private int duck1_count = 0, duck2_count = 0;
-    private int position;
-    public static Rect duck1 = new Rect(75, 140, 100, 100);
-    public static Rect duck2 = new Rect(190, 140, 100, 100);
+    private int position = 0;
+    public static Rect duck1 = new Rect(0, 120, 120, 200);
+    public static Rect duck2 = new Rect(120, 120, 120, 200);
     public static Scalar hsv_low = new Scalar(0, 164, 0), hsv_high = new Scalar(113, 255, 255);
-    private Mat mat_hsv = new Mat(), mat_binary = new Mat(), mask = new Mat();
+    private final Mat mat_hsv = new Mat();
+    private final Mat mat_binary = new Mat();
 
     @Override
     public Mat processFrame(Mat input) {
@@ -39,7 +39,7 @@ public class DuckPosition extends OpenCvPipeline {
         return input;
     }
 
-    public int getPosition() {
+    public int getLevel() {
         return position;
     }
 }
