@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.custommodules;
-
-import androidx.annotation.NonNull;
+package org.firstinspires.ftc.team11047.custommodules;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -8,21 +6,25 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 @Config
-public class Chassis extends Thread {
+public class Chassis {
     public final Wheel lf, lb, rf, rb;
     public final BNO055IMU imu;
 
-    public static double max_accelerate = 100,
+    public static double max_accelerate = 50,
             terminate_power = 0,
-            code_per_inch_right = 55.387,
-            code_per_inch_forward = 50,
+            code_per_inch_right = 55,
+            code_per_inch_forward = 42.6,
             turn_weight = 10,
-            trace_kp = 0.18;
+            trace_kp = 0.2;
+    public static int buffer_size = 2;
     private double last_refresh_time, loop_time = 0;
-    public double current_x, current_y, current_direction;
+    public double current_x, current_y, current_direction, target_x, target_y, target_direction;
     private Orientation last_direction;
     private final LinearOpMode opMode;
 
@@ -40,6 +42,9 @@ public class Chassis extends Thread {
         parameters.calibrationDataFile = "AdafruitIMUCalibration.json";
         parameters.loggingEnabled = false;
         imu.initialize(parameters);
+        imu.startAccelerationIntegration(new Position(DistanceUnit.INCH, 0, 0, 0, 0),
+                new Velocity(DistanceUnit.INCH, 0, 0, 0, 0),
+                1);
         last_direction = imu.getAngularOrientation();
         last_refresh_time = opMode.getRuntime();
     }
@@ -61,7 +66,6 @@ public class Chassis extends Thread {
         lb.setPower(rearLeft_Power * k);
         rf.setPower(forwardRight_Power * k);
         rb.setPower(rearRight_Power * k);
-        refreshPosition();
     }
 
     public void move(double x_Speed, double y_Speed, double turnSpeed, double speed) {
@@ -71,14 +75,14 @@ public class Chassis extends Thread {
     }
 
     public interface Period {
-        boolean execute();
+        void execute();
     }
 
     public void move_to(double target_X, double target_Y, double target_Direction, double maxSpeed) {
-        move_to(target_X, target_Y, target_Direction, maxSpeed, null);
+        move_to(target_X, target_Y, target_Direction, maxSpeed, 0, null);
     }
 
-    public void move_to(double target_X, double target_Y, double target_Direction, double maxSpeed, Period period) {
+    public void move_to(double target_X, double target_Y, double target_Direction, double maxSpeed, double quit, Period period) {
         double total_X = target_X - current_x;
         double total_Y = target_Y - current_y;
         double total_Direction = target_Direction - current_direction;
@@ -88,20 +92,23 @@ public class Chassis extends Thread {
         double incomplete_Rate = 0;
         double error = distance;
         if (period == null)
-            period = () -> true;
+            period = () -> {
+            };
         while (opMode.opModeIsActive()
-                && period.execute()
-                && (opMode.getRuntime() - startTime) < totalTime + 1.5
-                && (incomplete_Rate > 0 || error > 1)) {
-
+                && (opMode.getRuntime() - startTime) < totalTime + 1
+                && (incomplete_Rate != 0 || error > quit)) {
+            period.execute();
             incomplete_Rate = (opMode.getRuntime() - startTime) <= totalTime ? (Math.cos(Math.PI * (opMode.getRuntime() - startTime) / totalTime) + 1) / 2 : 0;
-            double error_X = target_X - total_X * incomplete_Rate - current_x;
-            double error_Y = target_Y - total_Y * incomplete_Rate - current_y;
-            double error_direction = target_Direction - total_Direction * incomplete_Rate - current_direction;
-
+            this.target_x = target_X - total_X * incomplete_Rate;
+            this.target_y = target_Y - total_Y * incomplete_Rate;
+            this.target_direction = target_Direction - total_Direction * incomplete_Rate;
+            double error_X = this.target_x - current_x;
+            double error_Y = this.target_y - current_y;
+            double error_direction = this.target_direction - current_direction;
             error_direction *= turn_weight;
             error = Math.sqrt(error_X * error_X + error_Y * error_Y + error_direction * error_direction);
-            move(error_X, error_Y, error_direction, MyMath.distanceToPower(error) * trace_kp);
+            move(error_X, error_Y / code_per_inch_forward * code_per_inch_right, error_direction,
+                    MyMath.distanceToPower(error) * trace_kp);
         }
         lf.setPower(0);
         lb.setPower(0);
@@ -132,20 +139,19 @@ public class Chassis extends Thread {
         else if (d_turn > Math.PI)
             d_turn -= 2 * Math.PI;
         last_direction = now_direction;
-
         current_x += d_right * Math.cos(current_direction) - d_forward * Math.sin(current_direction);
         current_y += d_right * Math.sin(current_direction) + d_forward * Math.cos(current_direction);
         current_direction += d_turn;
         opMode.telemetry.addData("currentX", current_x);
         opMode.telemetry.addData("currentY", current_y);
         opMode.telemetry.addData("currentDirection", current_direction);
-        opMode.telemetry.update();
     }
 
     public class Wheel {
         private final DcMotor wheel;
-        public int currentPosition, previousPosition;
         private double currentSpeed, previousSpeed;
+        private final int[] position = new int[buffer_size];
+        private int index = -1;
 
         public Wheel(DcMotor wheel, DcMotorSimple.Direction direction) {
             this.wheel = wheel;
@@ -158,14 +164,17 @@ public class Chassis extends Thread {
 
         public void reset() {
             last_refresh_time = opMode.getRuntime();
-            previousPosition = currentPosition = getPosition();
+            int temp = wheel.getCurrentPosition();
+            for (int i = 0; i < buffer_size; ++i)
+                position[i] = temp;
+            currentSpeed = previousSpeed = 0;
         }
 
         public void refresh() {
-            previousPosition = currentPosition;
+            index = (index + 1) % buffer_size;
+            position[index] = wheel.getCurrentPosition();
             previousSpeed = currentSpeed;
-            currentPosition = wheel.getCurrentPosition();
-            currentSpeed = (currentPosition - previousPosition) / loop_time;
+            currentSpeed = (position[index] - position[(index + 1) % buffer_size]) / loop_time / (buffer_size - 1);
         }
 
         public void setPower(double power) {
@@ -173,7 +182,7 @@ public class Chassis extends Thread {
         }
 
         public int getPosition() {
-            return currentPosition;
+            return position[index];
         }
 
         public double getSpeed() {

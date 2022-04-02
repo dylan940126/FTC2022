@@ -1,8 +1,10 @@
-package org.firstinspires.ftc.teamcode.custommodules;
+package org.firstinspires.ftc.team11047.custommodules;
 
 public class TwoSwitchs {
-    private Switch buttonUp, buttonDown;
-    private int level, total;
+    private final Switch buttonUp;
+    private final Switch buttonDown;
+    private int level;
+    private final int total;
 
     public TwoSwitchs(int total_levels, int start_level) {
         total = total_levels;

@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team11047;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.custommodules.DriverBase;
+import org.firstinspires.ftc.team11047.custommodules.DriverBase;
 
 @Autonomous
 public class GoBack extends LinearOpMode {
@@ -15,7 +15,7 @@ public class GoBack extends LinearOpMode {
         driverBase.initDevices();
         driverBase.switchToDockPipeline();
         waitForStart();
-        driverBase.turntable.setHeight(driverBase.levelPipeline.getLevel());
+        driverBase.turntable.setHeight(driverBase.duckPipeline.getLevel());
         driverBase.chassis.drive(0, -1, 0, 0.7);
         sleep(530);
         driverBase.chassis.drive(0, 0, 0, 0);
