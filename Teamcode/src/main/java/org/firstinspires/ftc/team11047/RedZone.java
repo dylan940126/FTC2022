@@ -9,12 +9,8 @@ import org.firstinspires.ftc.team11047.custommodules.MyMath;
 @Autonomous
 public class RedZone extends LinearOpMode {
     DriverBase driverBase = new DriverBase(this);
-    double time;
+    double time = 0, last_y = 50;
     int red = 1;
-
-//    public RedZone(LinearOpMode linearOpMode) {
-//        this = linearOpMode;
-//    }
 
     @Override
     public void runOpMode() {
@@ -40,8 +36,8 @@ public class RedZone extends LinearOpMode {
                 driverBase.chassis.drive(0.1 * red, -1, 0.1 * red, 0.5);
             driverBase.chassis.drive(0, 0, 0, 0);
 //            aim and pour
-            for (int check = 0; check < 100; ++check) {
-                while (opModeIsActive() && (Math.abs(driverBase.hubPipeline.getX()) > 30 || !driverBase.turntable.isPourable()))
+            for (int check = 0; check < 20; ++check) {
+                while (opModeIsActive() && (Math.abs(driverBase.hubPipeline.getX()) > 20 || !driverBase.turntable.isPourable()))
                     driverBase.chassis.drive(0.1 * Math.abs(driverBase.hubPipeline.getX()) * red, driverBase.hubPipeline.getX() * red, 0,
                             1.1 * Math.abs(MyMath.distanceToPower(driverBase.hubPipeline.getX()) / 30));
             }
@@ -52,19 +48,31 @@ public class RedZone extends LinearOpMode {
             driverBase.chassis.resetPosition(0, 0, 0);
             driverBase.turntable.backFlow();
 //            going to collect
-            while (opModeIsActive() && driverBase.chassis.current_y < 43) {
-                driverBase.chassis.drive(0.1 * red, 1, -0.1 * red, 1);
+            while (opModeIsActive() && driverBase.chassis.current_y < last_y) {
+                driverBase.chassis.drive(0.1 * red, 1, -0.1 * red,
+                        MyMath.distanceToPower(last_y - driverBase.chassis.current_y) / 4);
                 driverBase.turntable.setHeight(0);
+                driverBase.turntable.collect();
             }
             driverBase.chassis.drive(0, 0, 0, 0);
             driverBase.chassis.resetPosition(0, driverBase.chassis.current_y, 0);
-            driverBase.turntable.collect();
-            driverBase.chassis.move_to(-((cycle % 2) * 0 + 3) * red, 51 + cycle / 2 * 2, 0, 1, 1, null);
-            while (opModeIsActive() && !driverBase.turntable.isCarry())
-                driverBase.chassis.move(0, 0.15,
-                        Math.cos((getRuntime() - time) * 2 * Math.PI / 1.5) - driverBase.chassis.current_direction, 0.3);
+            if (cycle % 2 == 1)
+                while (opModeIsActive() && !driverBase.turntable.isCarry() && Math.abs(0.8 * red - driverBase.chassis.current_direction) > 0.1)
+                    driverBase.chassis.drive(0, 0.3,
+                            0.8 * red - driverBase.chassis.current_direction,
+                            Math.abs(0.8 * red - driverBase.chassis.current_direction));
+            time = getRuntime();
+            while (opModeIsActive() && !driverBase.turntable.isCarry()) {
+                if ((getRuntime() - time) % 1 < 0.5)
+                    driverBase.chassis.drive(0, -1, 0, 0.05);
+                else
+                    driverBase.chassis.drive(0, 1,
+                            0, 0.2);
+            }
+            last_y = driverBase.chassis.current_y;
             driverBase.turntable.backFlow();
-            while (opModeIsActive() && driverBase.chassis.current_x * red < 0)
+            time = getRuntime();
+            while (opModeIsActive() && (driverBase.chassis.current_x * red < 0 || getRuntime() - time < 0.5))
                 driverBase.chassis.move(1 * red, -1, (0.2 * red - driverBase.chassis.current_direction) * 1, 1);
 
             if (getRuntime() > 26)

@@ -90,6 +90,6 @@ public class DriverBase {
     }
 
     public void waitForCamera() {
-        while (opMode.opModeIsActive() && !camera_ready) ;
+        while (!opMode.isStopRequested() && !camera_ready) ;
     }
 }

@@ -14,10 +14,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class TurnTable {
     private final LinearOpMode opMode;
-    private final DcMotor raise, extend, intake, turn;
-    private final Servo container, ship;
-    private final CRServo spinner;
-    private final DistanceSensor object_detector;
+    public final DcMotor raise, extend, intake, turn;
+    public final Servo container, ship;
+    public final CRServo spinner;
+    public final DistanceSensor object_detector;
     private final boolean last_direction;
     private boolean last_detect = false;
     private double detect_time = 0;
@@ -72,7 +72,7 @@ public class TurnTable {
     }
 
     public void backFlow() {
-        intake.setPower(-1);
+        intake.setPower(-0.8);
     }
 
     public void stopCollect() {
@@ -134,7 +134,7 @@ public class TurnTable {
 
     public boolean isCarry() {
         if (!isCollectable())
-            return last_detect;
+            return false;
         boolean now_detect = object_detector.getDistance(DistanceUnit.CM) < 15;
         if (!last_detect && now_detect)
             detect_time = opMode.getRuntime();

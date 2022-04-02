@@ -15,7 +15,7 @@ public class DuckPipeline extends OpenCvPipeline {
     private int position = 0;
     public static Rect duck1 = new Rect(0, 120, 120, 200);
     public static Rect duck2 = new Rect(120, 120, 120, 200);
-    public static Scalar hsv_low = new Scalar(0, 164, 0), hsv_high = new Scalar(113, 255, 255);
+    private static Scalar hsv_low = new Scalar(0, 164, 0), hsv_high = new Scalar(113, 255, 255);
     private final Mat mat_hsv = new Mat();
     private final Mat mat_binary = new Mat();
 
