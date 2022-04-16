@@ -21,24 +21,24 @@ public abstract class RobotFrame extends Chassis {
 
     public void initFrame() {
         initChassis();
-        container = hardwareMap.servo.get("lifter");
+        container = hardwareMap.servo.get("basket");
         noPour();
-        intake = hardwareMap.dcMotor.get("intake");
+        intake = hardwareMap.dcMotor.get("suck");
 //        intake.setDirection(DcMotor.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        turn = hardwareMap.dcMotor.get("btm");
+        turn = hardwareMap.dcMotor.get("turn");
         turn.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turn.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turn.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spinner = hardwareMap.crservo.get("spinner");
-        ship = hardwareMap.servo.get("ship");
+        spinner = hardwareMap.crservo.get("duck");
+        ship = hardwareMap.servo.get("teammark");
 //        ship.setDirection(Servo.Direction.REVERSE);
         ship.scaleRange(0, 0.94);
-        object_detector = hardwareMap.get(DistanceSensor.class, "objdetect");
-        raise = hardwareMap.dcMotor.get("la");
+        object_detector = hardwareMap.get(DistanceSensor.class, "dis");
+        raise = hardwareMap.dcMotor.get("angle");
         raise.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         raise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extend = hardwareMap.dcMotor.get("extend");
+        extend = hardwareMap.dcMotor.get("rail");
         extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

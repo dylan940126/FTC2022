@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.team11047.ftc2022;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -47,19 +46,11 @@ public class DuckPipeline extends OpenCvPipeline {
     private Mat leftROI = new Mat();
     private Mat midROI = new Mat();
 
-
-    Telemetry telemetry;
-
     Point rect = new Point(65, 45);
     Rect left = new Rect(0, 0, (int) rect.x, (int) rect.y);
     Rect mid = new Rect(0, 0, (int) rect.x, (int) rect.y);
 
-    int position = 0; // left = 0, mid = 1, right = 2;
-
-    public DuckPipeline(Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
-
+    public int position = 0; // left = 0, mid = 1, right = 2;
 
     @Override
     public Mat processFrame(Mat input) {
@@ -143,4 +134,7 @@ public class DuckPipeline extends OpenCvPipeline {
         return maskedInputMat;
     }
 
+    public int getLevel() {
+        return position + 1;
+    }
 }

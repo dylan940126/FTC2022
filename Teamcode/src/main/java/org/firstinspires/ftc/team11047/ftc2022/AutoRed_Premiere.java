@@ -47,7 +47,7 @@ public class AutoRed_Premiere extends LinearOpMode {
         telemetry.update();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        pipeline = new DuckPipeline(telemetry);
+        pipeline = new DuckPipeline();
         webcam.setPipeline(pipeline);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {

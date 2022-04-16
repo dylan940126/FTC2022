@@ -1,20 +1,15 @@
 package org.firstinspires.ftc.team11047.custommodules;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-
 @Config
 public abstract class Chassis extends LinearOpMode {
     public Wheel lf, lb, rf, rb;
-    public BNO055IMU imu;
+    public ModernRoboticsI2cGyro gyro;
 
     public double max_accelerate = 50,
             terminate_power = 0,
@@ -25,26 +20,18 @@ public abstract class Chassis extends LinearOpMode {
     public int buffer_size = 2;
     private double last_refresh_time, loop_time = 0;
     public double current_x, current_y, current_direction, target_x, target_y, target_direction;
-    private Orientation last_direction;
+    private int last_direction;
 
     public void initChassis() {
         lf = new Wheel(hardwareMap.dcMotor.get("lf"), DcMotor.Direction.REVERSE);
         lb = new Wheel(hardwareMap.dcMotor.get("lb"), DcMotor.Direction.REVERSE);
         rf = new Wheel(hardwareMap.dcMotor.get("rf"), DcMotor.Direction.FORWARD);
         rb = new Wheel(hardwareMap.dcMotor.get("rb"), DcMotor.Direction.FORWARD);
-        imu = hardwareMap.get(BNO055IMU.class, "imu 1");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.IMU;
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json";
-        parameters.loggingEnabled = false;
-        imu.initialize(parameters);
-        imu.startAccelerationIntegration(new Position(DistanceUnit.INCH, 0, 0, 0, 0),
-                new Velocity(DistanceUnit.INCH, 0, 0, 0, 0),
-                1);
-        last_direction = imu.getAngularOrientation();
+        gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        gyro.calibrate();
+        last_direction = gyro.getHeading();
         last_refresh_time = getRuntime();
+        while (!gyro.isCalibrating()) ;
     }
 
     public void drive(double right_speed, double forward_speed, double turn_speed, double speed) {
@@ -127,19 +114,19 @@ public abstract class Chassis extends LinearOpMode {
         lb.refresh();
         rf.refresh();
         rb.refresh();
-        Orientation now_direction = imu.getAngularOrientation();
+        int now_direction = gyro.getHeading();
 
         double d_right = (lf.getSpeed() - lb.getSpeed() - rf.getSpeed() + rb.getSpeed()) / 4 * loop_time / code_per_inch_right;
         double d_forward = (lf.getSpeed() + lb.getSpeed() + rf.getSpeed() + rb.getSpeed()) / 4 * loop_time / code_per_inch_forward;
-        double d_turn = now_direction.firstAngle - last_direction.firstAngle;
-        if (d_turn < -Math.PI)
-            d_turn += 2 * Math.PI;
-        else if (d_turn > Math.PI)
-            d_turn -= 2 * Math.PI;
+        double d_turn = now_direction - last_direction;
+        if (d_turn < -180)
+            d_turn += 360;
+        else if (d_turn > 180)
+            d_turn -= 360;
         last_direction = now_direction;
         current_x += d_right * Math.cos(current_direction) - d_forward * Math.sin(current_direction);
         current_y += d_right * Math.sin(current_direction) + d_forward * Math.cos(current_direction);
-        current_direction += d_turn;
+        current_direction += Math.toRadians(d_turn);
         telemetry.addData("currentX", current_x);
         telemetry.addData("currentY", current_y);
         telemetry.addData("currentDirection", current_direction);

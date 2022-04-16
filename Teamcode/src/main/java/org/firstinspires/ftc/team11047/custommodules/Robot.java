@@ -5,8 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.team11047.easyopencv.DuckPipeline;
 import org.firstinspires.ftc.team11047.easyopencv.HubPipeline;
+import org.firstinspires.ftc.team11047.ftc2022.DuckPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
