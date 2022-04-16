@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team11047.ftc2022;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -232,23 +233,26 @@ public class AutoBlue_Premiere extends LinearOpMode {
     void back() {
         //back to white strip
         while (opModeIsActive() && distance.getDistance(DistanceUnit.CM) > 10) {
+            robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
             double p = (distance.getDistance(DistanceUnit.CM) - 12) * 0.09 + 0.15;
             if (distance.getDistance(DistanceUnit.CM) < 25)
                 robot.move(-Range.clip(p, 0.2, 0.7), Range.clip(-1 + p, -0.8, -0.5), 0);
             else
-                robot.move(-0.8, -0.2, (getHeading()) * 0.025);
+                robot.move(-0.8, 0, (getHeading()) * 0.025);
             telemetry.addLine("back to white strip");
             telemetry.update();
         }
         robot.move(0, 0, 0);
         stretch();
         //readjust
+        robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
         while (opModeIsActive() && tube.getDistance(DistanceUnit.CM) > 6) {
             robot.Odometry();
             robot.move(-0.1, -1, (getHeading()) * 0.025);
         }
         robot.move(0, 0, 0);
         robot.setY(105);
+        robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
         //back to put
         while (opModeIsActive() && robot.getY() > autoConstant.start_position + 5) {
             robot.Odometry();
@@ -264,6 +268,7 @@ public class AutoBlue_Premiere extends LinearOpMode {
             robot.Odometry();
             robot.move(0, 0, Range.clip(getHeading() * 0.5, -0.5, 0.5));
         }
+        robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
     }
 
     public void fold() {

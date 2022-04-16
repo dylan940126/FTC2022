@@ -3,8 +3,8 @@ package org.firstinspires.ftc.team11047;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.team11047.custommodules.Robot;
 import org.firstinspires.ftc.team11047.custommodules.MyMath;
+import org.firstinspires.ftc.team11047.custommodules.Robot;
 
 @TeleOp
 @Config

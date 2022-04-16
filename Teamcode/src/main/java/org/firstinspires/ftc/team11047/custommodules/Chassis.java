@@ -16,7 +16,8 @@ public abstract class Chassis extends LinearOpMode {
             code_per_inch_right = 55,
             code_per_inch_forward = 42.6,
             turn_weight = 10,
-            trace_kp = 0.2;
+            trace_kp = 0.2,
+            turn_k = 1.06825;
     public int buffer_size = 2;
     private double last_refresh_time, loop_time = 0;
     public double current_x, current_y, current_direction, target_x, target_y, target_direction;
@@ -123,6 +124,7 @@ public abstract class Chassis extends LinearOpMode {
             d_turn += 360;
         else if (d_turn > 180)
             d_turn -= 360;
+        d_turn *= turn_k;
         last_direction = now_direction;
         current_x += d_right * Math.cos(current_direction) - d_forward * Math.sin(current_direction);
         current_y += d_right * Math.sin(current_direction) + d_forward * Math.cos(current_direction);

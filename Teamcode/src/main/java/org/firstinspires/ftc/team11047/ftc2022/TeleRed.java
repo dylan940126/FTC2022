@@ -72,18 +72,17 @@ public class TeleRed extends OpMode {
             robot.duck.setPosition(0.5);
 
         //turn
-        int target;
-        tmp = gamepad1.y;
+        int ang = 0;
+        tmp = gamepad2.dpad_left;
         if (tmp && !lastifturn)
-            ifturn = !ifturn;
+            ang -= 100;
         lastifturn = tmp;
-        if (ifturn) {
-            target = 4300;
-            // 180 degrees = 4300 ticks
-        } else {
-            target = 0;
-        }
-        robot.setTurn(target, 0.6);
+        tmp = gamepad2.dpad_right;
+        if (tmp && !lastifturn)
+            ang += 100;
+        lastifturn = tmp;
+        robot.turn.setTargetPosition(robot.turn.getTargetPosition() + ang);
+        robot.turn.setPower(0.35);
 
         //teammark
         tmp = gamepad2.dpad_up;
@@ -155,7 +154,7 @@ public class TeleRed extends OpMode {
             if (gamepad2.left_trigger > 0.5) {
                 robot.rail.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.setAngle(50, 0.4);
-                robot.rail.setPower(0.7);
+                robot.rail.setPower(0.5);
             } else if (gamepad2.right_trigger > 0.5) {
                 robot.rail.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.rail.setPower(-0.7);
@@ -167,7 +166,7 @@ public class TeleRed extends OpMode {
                 robot.rail.setPower(0);
             }
 
-            int ang = 0;
+            ang = 0;
             tmp = gamepad2.a;
             if (tmp && !lastifa)
                 ang -= 50;

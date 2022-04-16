@@ -2,8 +2,8 @@ package org.firstinspires.ftc.team11047;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.team11047.custommodules.Robot;
 import org.firstinspires.ftc.team11047.custommodules.MyMath;
+import org.firstinspires.ftc.team11047.custommodules.Robot;
 
 @Autonomous
 public class RedZone extends Robot {

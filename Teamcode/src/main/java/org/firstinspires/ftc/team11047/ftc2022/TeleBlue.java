@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team11047.ftc2022;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -57,7 +58,10 @@ public class TeleBlue extends OpMode {
             robot.Suck(0.7);
         else
             robot.Suck(0);
-
+        if (robot.distance.getDistance(DistanceUnit.CM) < 10)
+            robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        else
+            robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
         //basket
         robot.setBasket(gamepad2.x);
 
@@ -150,7 +154,7 @@ public class TeleBlue extends OpMode {
             if (gamepad2.left_trigger > 0.5) {
                 robot.rail.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.setAngle(50, 0.4);
-                robot.rail.setPower(0.7);
+                robot.rail.setPower(0.5);
             } else if (gamepad2.right_trigger > 0.5) {
                 robot.rail.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.rail.setPower(-0.7);

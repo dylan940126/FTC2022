@@ -236,7 +236,7 @@ public class AutoRed_Premiere extends LinearOpMode {
             robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
             double p = (distance.getDistance(DistanceUnit.CM) - 12) * 0.09 + 0.15;
             if (distance.getDistance(DistanceUnit.CM) < 25)
-                robot.move(Range.clip(p, 0.2, 0.7), Range.clip(-1 + p, -0.8, -0.5), 0);
+                robot.move(Range.clip(p, 0.2, 0.5), Range.clip(-1 + p, -0.8, -0.6), Range.clip(getHeading() * 0.04, -0.3, 0.3));
             else
                 robot.move(0.8, -0.5, Range.clip(getHeading() * 0.04, -0.3, 0.3));
             telemetry.addLine("back to white strip");
@@ -248,7 +248,7 @@ public class AutoRed_Premiere extends LinearOpMode {
         robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
         while (opModeIsActive() && tube.getDistance(DistanceUnit.CM) > 6) {
             robot.Odometry();
-            robot.move(0.25, -0.9, (getHeading() - 15) * 0.08);
+            robot.move(0.25, -0.9, Range.clip((getHeading() - 7) * 0.04, -0.3, 0.3));
         }
         robot.move(0, 0, 0);
         robot.setY(115);
@@ -264,6 +264,10 @@ public class AutoRed_Premiere extends LinearOpMode {
         robot.move(0, 0, 0);
         sleep(300);
         robot.setBasket(false);
+        while (opModeIsActive() && Math.abs(getHeading()) > 0) {
+            robot.Odometry();
+            robot.move(0, 0, Range.clip(getHeading() * 0.5, -0.5, 0.5));
+        }
         robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
     }
 

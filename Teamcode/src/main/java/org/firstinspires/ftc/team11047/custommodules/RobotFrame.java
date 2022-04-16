@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.team11047.custommodules;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public abstract class RobotFrame extends Chassis {
     public DcMotor raise, extend, intake, turn;
     public Servo container, ship;
-    public CRServo spinner;
+    public Servo spinner;
     public DistanceSensor object_detector;
     private boolean last_detect = false;
     private double detect_time = 0;
@@ -30,7 +29,7 @@ public abstract class RobotFrame extends Chassis {
         turn.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turn.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turn.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spinner = hardwareMap.crservo.get("duck");
+        spinner = hardwareMap.servo.get("duck");
         ship = hardwareMap.servo.get("teammark");
 //        ship.setDirection(Servo.Direction.REVERSE);
         ship.scaleRange(0, 0.94);
@@ -145,15 +144,15 @@ public abstract class RobotFrame extends Chassis {
     }
 
     public void setSpinnerRed() {
-        spinner.setPower(-duck_power);
+        spinner.setPosition((1 - duck_power) / 2);
     }
 
     public void setSpinnerBlue() {
-        spinner.setPower(duck_power);
+        spinner.setPosition((1 + duck_power) / 2);
     }
 
     public void setSpinnerStop() {
-        spinner.setPower(0);
+        spinner.setPosition(0.5);
     }
 
     public void resetRaise() {

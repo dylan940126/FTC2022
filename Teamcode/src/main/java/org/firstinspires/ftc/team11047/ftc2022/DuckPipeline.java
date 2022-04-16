@@ -50,7 +50,7 @@ public class DuckPipeline extends OpenCvPipeline {
     Rect left = new Rect(0, 0, (int) rect.x, (int) rect.y);
     Rect mid = new Rect(0, 0, (int) rect.x, (int) rect.y);
 
-    public int position = 0; // left = 0, mid = 1, right = 2;
+    int position = 0; // left = 0, mid = 1, right = 2;
 
     @Override
     public Mat processFrame(Mat input) {
@@ -137,4 +137,5 @@ public class DuckPipeline extends OpenCvPipeline {
     public int getLevel() {
         return position + 1;
     }
+
 }

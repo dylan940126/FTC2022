@@ -14,7 +14,7 @@ public class Auto_Constant {
     //rail encoder
     int bottom_rail = 1930;
     int middle_rail = 2100;
-    int top_rail = 2250;
+    int top_rail = 2150;
 
     //turn(degree)
     double turn_degree = 32.5;
