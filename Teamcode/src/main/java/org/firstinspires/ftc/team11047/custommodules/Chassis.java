@@ -12,29 +12,27 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 @Config
-public class Chassis {
-    public final Wheel lf, lb, rf, rb;
-    public final BNO055IMU imu;
+public abstract class Chassis extends LinearOpMode {
+    public Wheel lf, lb, rf, rb;
+    public BNO055IMU imu;
 
-    public static double max_accelerate = 50,
+    public double max_accelerate = 50,
             terminate_power = 0,
             code_per_inch_right = 55,
             code_per_inch_forward = 42.6,
             turn_weight = 10,
             trace_kp = 0.2;
-    public static int buffer_size = 2;
+    public int buffer_size = 2;
     private double last_refresh_time, loop_time = 0;
     public double current_x, current_y, current_direction, target_x, target_y, target_direction;
     private Orientation last_direction;
-    private final LinearOpMode opMode;
 
-    public Chassis(LinearOpMode opMode) {
-        this.opMode = opMode;
-        lf = new Wheel(opMode.hardwareMap.dcMotor.get("lf"), DcMotor.Direction.REVERSE);
-        lb = new Wheel(opMode.hardwareMap.dcMotor.get("lb"), DcMotor.Direction.REVERSE);
-        rf = new Wheel(opMode.hardwareMap.dcMotor.get("rf"), DcMotor.Direction.FORWARD);
-        rb = new Wheel(opMode.hardwareMap.dcMotor.get("rb"), DcMotor.Direction.FORWARD);
-        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu 1");
+    public void initChassis() {
+        lf = new Wheel(hardwareMap.dcMotor.get("lf"), DcMotor.Direction.REVERSE);
+        lb = new Wheel(hardwareMap.dcMotor.get("lb"), DcMotor.Direction.REVERSE);
+        rf = new Wheel(hardwareMap.dcMotor.get("rf"), DcMotor.Direction.FORWARD);
+        rb = new Wheel(hardwareMap.dcMotor.get("rb"), DcMotor.Direction.FORWARD);
+        imu = hardwareMap.get(BNO055IMU.class, "imu 1");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
@@ -46,7 +44,7 @@ public class Chassis {
                 new Velocity(DistanceUnit.INCH, 0, 0, 0, 0),
                 1);
         last_direction = imu.getAngularOrientation();
-        last_refresh_time = opMode.getRuntime();
+        last_refresh_time = getRuntime();
     }
 
     public void drive(double right_speed, double forward_speed, double turn_speed, double speed) {
@@ -87,18 +85,18 @@ public class Chassis {
         double total_Y = target_Y - current_y;
         double total_Direction = target_Direction - current_direction;
         double distance = Math.sqrt(total_X * total_X + total_Y * total_Y + total_Direction * total_Direction * turn_weight * turn_weight);
-        double startTime = opMode.getRuntime();
+        double startTime = getRuntime();
         double totalTime = Math.min(Math.sqrt(distance / max_accelerate / 2), distance / maxSpeed / 2) * Math.PI;
         double incomplete_Rate = 0;
         double error = distance;
         if (period == null)
             period = () -> {
             };
-        while (opMode.opModeIsActive()
-                && (opMode.getRuntime() - startTime) < totalTime + 1
+        while (opModeIsActive()
+                && (getRuntime() - startTime) < totalTime + 1
                 && (incomplete_Rate != 0 || error > quit)) {
             period.execute();
-            incomplete_Rate = (opMode.getRuntime() - startTime) <= totalTime ? (Math.cos(Math.PI * (opMode.getRuntime() - startTime) / totalTime) + 1) / 2 : 0;
+            incomplete_Rate = (getRuntime() - startTime) <= totalTime ? (Math.cos(Math.PI * (getRuntime() - startTime) / totalTime) + 1) / 2 : 0;
             this.target_x = target_X - total_X * incomplete_Rate;
             this.target_y = target_Y - total_Y * incomplete_Rate;
             this.target_direction = target_Direction - total_Direction * incomplete_Rate;
@@ -123,8 +121,8 @@ public class Chassis {
     }
 
     public void refreshPosition() {
-        loop_time = opMode.getRuntime() - last_refresh_time;
-        last_refresh_time = opMode.getRuntime();
+        loop_time = getRuntime() - last_refresh_time;
+        last_refresh_time = getRuntime();
         lf.refresh();
         lb.refresh();
         rf.refresh();
@@ -142,9 +140,9 @@ public class Chassis {
         current_x += d_right * Math.cos(current_direction) - d_forward * Math.sin(current_direction);
         current_y += d_right * Math.sin(current_direction) + d_forward * Math.cos(current_direction);
         current_direction += d_turn;
-        opMode.telemetry.addData("currentX", current_x);
-        opMode.telemetry.addData("currentY", current_y);
-        opMode.telemetry.addData("currentDirection", current_direction);
+        telemetry.addData("currentX", current_x);
+        telemetry.addData("currentY", current_y);
+        telemetry.addData("currentDirection", current_direction);
     }
 
     public class Wheel {
@@ -163,7 +161,7 @@ public class Chassis {
         }
 
         public void reset() {
-            last_refresh_time = opMode.getRuntime();
+            last_refresh_time = getRuntime();
             int temp = wheel.getCurrentPosition();
             for (int i = 0; i < buffer_size; ++i)
                 position[i] = temp;
