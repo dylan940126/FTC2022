@@ -2,7 +2,6 @@ package org.firstinspires.ftc.team11047.custommodules;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -15,31 +14,23 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.concurrent.TimeUnit;
 
-public class DriverBase {
-    public Chassis chassis;
-    public TurnTable turntable;
+public abstract class Robot extends RobotFrame {
     public FtcDashboard dashboard;
     public HubPipeline hubPipeline;
     public DuckPipeline duckPipeline;
     public WebcamName webcam_Name;
     public OpenCvWebcam webcam;
     private boolean camera_ready = false;
-    private final LinearOpMode opMode;
 
-    public DriverBase(LinearOpMode opMode) {
-        this.opMode = opMode;
-    }
-
-    public void initDevices() {
+    public void initRobot() {
+        initFrame();
         initDashboard();
         init_Camera();
-        chassis = new Chassis(opMode);
-        chassis.resetPosition(0, 0, 0);
-        turntable = new TurnTable(opMode);
+        resetPosition(0, 0, 0);
         new Thread(() -> {
-            while (!opMode.isStopRequested()) {
-                chassis.refreshPosition();
-                opMode.telemetry.update();
+            while (!isStopRequested()) {
+                refreshPosition();
+                telemetry.update();
             }
         }).start();
         waitForCamera();
@@ -47,13 +38,13 @@ public class DriverBase {
 
     public void initDashboard() {
         dashboard = FtcDashboard.getInstance();
-        opMode.telemetry = new MultipleTelemetry(opMode.telemetry, dashboard.getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
     }
 
     public void init_Camera() {
         hubPipeline = new HubPipeline();
         duckPipeline = new DuckPipeline();
-        webcam_Name = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcam_Name = hardwareMap.get(WebcamName.class, "Webcam 1");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcam_Name);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -90,6 +81,6 @@ public class DriverBase {
     }
 
     public void waitForCamera() {
-        while (!opMode.isStopRequested() && !camera_ready) ;
+        while (!isStopRequested() && !camera_ready) ;
     }
 }

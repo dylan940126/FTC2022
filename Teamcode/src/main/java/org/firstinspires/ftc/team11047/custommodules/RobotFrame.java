@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.team11047.custommodules;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -12,39 +9,36 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Config
-public class TurnTable {
-    private final LinearOpMode opMode;
-    public final DcMotor raise, extend, intake, turn;
-    public final Servo container, ship;
-    public final CRServo spinner;
-    public final DistanceSensor object_detector;
-    private final boolean last_direction;
+public abstract class RobotFrame extends Chassis {
+    public DcMotor raise, extend, intake, turn;
+    public Servo container, ship;
+    public CRServo spinner;
+    public DistanceSensor object_detector;
     private boolean last_detect = false;
     private double detect_time = 0;
-    public static int zero_position = 0;
-    public static double duck_power = 0.7;
+    public int zero_position = 0;
+    public double duck_power = 0.7;
 
-    public TurnTable(@NonNull LinearOpMode opMode) {
-        this.opMode = opMode;
-        container = opMode.hardwareMap.servo.get("lifter");
+    public void initFrame() {
+        initChassis();
+        container = hardwareMap.servo.get("lifter");
         noPour();
-        intake = opMode.hardwareMap.dcMotor.get("intake");
+        intake = hardwareMap.dcMotor.get("intake");
 //        intake.setDirection(DcMotor.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        turn = opMode.hardwareMap.dcMotor.get("btm");
+        turn = hardwareMap.dcMotor.get("btm");
         turn.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turn.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turn.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spinner = opMode.hardwareMap.crservo.get("spinner");
-        ship = opMode.hardwareMap.servo.get("ship");
+        spinner = hardwareMap.crservo.get("spinner");
+        ship = hardwareMap.servo.get("ship");
 //        ship.setDirection(Servo.Direction.REVERSE);
         ship.scaleRange(0, 0.94);
-        object_detector = opMode.hardwareMap.get(DistanceSensor.class, "objdetect");
-        last_direction = false;
-        raise = opMode.hardwareMap.dcMotor.get("la");
+        object_detector = hardwareMap.get(DistanceSensor.class, "objdetect");
+        raise = hardwareMap.dcMotor.get("la");
         raise.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         raise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extend = opMode.hardwareMap.dcMotor.get("extend");
+        extend = hardwareMap.dcMotor.get("extend");
         extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -137,9 +131,9 @@ public class TurnTable {
             return false;
         boolean now_detect = object_detector.getDistance(DistanceUnit.CM) < 15;
         if (!last_detect && now_detect)
-            detect_time = opMode.getRuntime();
+            detect_time = getRuntime();
         last_detect = now_detect;
-        return now_detect && (opMode.getRuntime() - detect_time) > 0.15;
+        return now_detect && (getRuntime() - detect_time) > 0.15;
     }
 
     public boolean isCollectable() {
@@ -167,10 +161,10 @@ public class TurnTable {
         raise.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extend.setPower(-0.5);
         raise.setPower(-0.3);
-        opMode.sleep(1000);
+        sleep(1000);
         extend.setPower(0);
         raise.setPower(0);
-        opMode.sleep(200);
+        sleep(200);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         raise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setHeight(0);

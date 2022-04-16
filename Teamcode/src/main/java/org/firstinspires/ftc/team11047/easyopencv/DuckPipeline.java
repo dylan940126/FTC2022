@@ -11,10 +11,11 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 @Config
 public class DuckPipeline extends OpenCvPipeline {
-    private int duck1_count = 0, duck2_count = 0;
+    private int duck1_count = 0, duck2_count = 0, duck3_count = 0;
     private int position = 0;
-    public static Rect duck1 = new Rect(0, 120, 120, 200);
-    public static Rect duck2 = new Rect(120, 120, 120, 200);
+    public static Rect duck1 = new Rect(0, 120, 80, 200);
+    public static Rect duck2 = new Rect(80, 120, 80, 200);
+    public static Rect duck3 = new Rect(160, 120, 80, 200);
     private static Scalar hsv_low = new Scalar(0, 164, 0), hsv_high = new Scalar(113, 255, 255);
     private final Mat mat_hsv = new Mat();
     private final Mat mat_binary = new Mat();
@@ -25,17 +26,20 @@ public class DuckPipeline extends OpenCvPipeline {
         Core.inRange(mat_hsv, hsv_low, hsv_high, mat_binary);
         duck1_count = Core.countNonZero(mat_binary.submat(duck1));
         duck2_count = Core.countNonZero(mat_binary.submat(duck2));
-        if (duck1_count > 2000)
-            if (duck2_count > 2000)
-                position = duck1_count > duck2_count ? 1 : 2;
+        duck3_count = Core.countNonZero(mat_binary.submat(duck3));
+        Math.max(duck1_count, Math.max(duck2_count, duck3_count));
+        if (duck1_count > duck2_count)
+            if (duck1_count > duck3_count)
+                position = duck1_count > 2000 ? 1 : 0;
             else
-                position = 1;
-        else if (duck2_count > 2000)
-            position = 2;
+                position = duck3_count > 2000 ? 3 : 0;
+        else if (duck2_count > duck3_count)
+            position = duck2_count > 2000 ? 2 : 0;
         else
-            position = 3;
+            position = duck3_count > 2000 ? 3 : 0;
         Imgproc.rectangle(input, duck1, new Scalar(0, 255, 0), 1);
         Imgproc.rectangle(input, duck2, new Scalar(0, 255, 0), 1);
+        Imgproc.rectangle(input, duck3, new Scalar(0, 255, 0), 1);
         return input;
     }
 

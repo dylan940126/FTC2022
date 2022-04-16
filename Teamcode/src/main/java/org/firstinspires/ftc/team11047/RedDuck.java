@@ -1,40 +1,38 @@
 package org.firstinspires.ftc.team11047;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.team11047.custommodules.DriverBase;
+import org.firstinspires.ftc.team11047.custommodules.Robot;
 
 @Autonomous
-public class RedDuck extends LinearOpMode {
-    DriverBase driverBase = new DriverBase(this);
+public class RedDuck extends Robot {
 
     @Override
     public void runOpMode() {
-        driverBase.initDevices();
-        driverBase.switchToDockPipeline();
+        initRobot();
+        switchToDockPipeline();
         while (!isStarted()) {
-            telemetry.addData("position", driverBase.duckPipeline.getLevel());
+            telemetry.addData("position", duckPipeline.getLevel());
             telemetry.update();
         }
         waitForStart();
-        int height = driverBase.duckPipeline.getLevel();
-        driverBase.switchToGoalPipeline();
-        driverBase.hubPipeline.setToRed();
-        driverBase.chassis.resetPosition(0, -23, 0);
-        driverBase.chassis.move_to(-42, -41, Math.toRadians(-90), 1);
-        driverBase.turntable.setHeight(height);
-        while(opModeIsActive()&&!driverBase.turntable.isPourable());
-        driverBase.turntable.pour();
+        int height = duckPipeline.getLevel();
+        switchToGoalPipeline();
+        hubPipeline.setToRed();
+        resetPosition(0, -23, 0);
+        move_to(-42, -41, Math.toRadians(-90), 1);
+        setHeight(height);
+        while (opModeIsActive() && !isPourable()) ;
+        pour();
         sleep(500);
-        driverBase.turntable.noPour();
-        while(opModeIsActive()&&!driverBase.turntable.isCollectable())
-            driverBase.turntable.setHeight(0);
-        driverBase.chassis.move_to(-11, -48, Math.toRadians(-90), 1);
-        driverBase.turntable.setSpinnerRed();
+        noPour();
+        while (opModeIsActive() && !isCollectable())
+            setHeight(0);
+        move_to(-10, -49, Math.toRadians(-90), 0.5);
+        setSpinnerRed();
         sleep(5000);
-        driverBase.turntable.setSpinnerStop();
-        driverBase.chassis.move_to(-27, -48, Math.toRadians(0), 1);
-        driverBase.chassis.move_to(0, 0, Math.toRadians(0), 1);
+        setSpinnerStop();
+        move_to(-27, -51, Math.toRadians(0), 1);
+        move_to(0, -23, Math.toRadians(0), 1);
     }
 }
