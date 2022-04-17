@@ -25,7 +25,7 @@ public class Pomelo {
 
     DistanceSensor distance = null;
     RevBlinkinLedDriver led = null;
-    public boolean bluseside = true;
+    public boolean bluseside = false;
 
     public ElapsedTime runtime = new ElapsedTime();
     IMU imu;
@@ -36,6 +36,7 @@ public class Pomelo {
     private final double fold = 0;
 
     Pomelo() {
+
     }
 
     public void init(HardwareMap ahwMap) {

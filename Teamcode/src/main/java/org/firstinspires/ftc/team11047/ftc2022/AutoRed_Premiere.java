@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.team11047.custommodules.MyMath;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -29,27 +30,23 @@ public class AutoRed_Premiere extends LinearOpMode {
     DistanceSensor tube = null;
 
     @Override
-    public void runOpMode() throws InterruptedException {
-
-        robot.bluseside = false;
+    public void runOpMode() {
         robot.init(hardwareMap);
         autoConstant = new Auto_Constant();
         distance = hardwareMap.get(DistanceSensor.class, "wall");
-        tube = hardwareMap.get(DistanceSensor.class, "redtube");
+        tube = hardwareMap.get(DistanceSensor.class, (robot.bluseside ? "bluetube" : "redtube"));
         gyrosensor = hardwareMap.gyroSensor.get("gyro");
         gyro = (ModernRoboticsI2cGyro) gyrosensor;
-        gyro.calibrate();
+        if (!gyro.isCalibrating())
+            gyro.calibrate();
         while (gyro.isCalibrating()) {
             telemetry.addLine("Gyro Calibrating.");
             telemetry.update();
         }
         telemetry.addLine("Complete");
         telemetry.update();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
-        pipeline = new DuckPipeline(telemetry);
-        webcam.setPipeline(pipeline);
-
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"));
+        pipeline = new DuckPipeline();
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -71,12 +68,11 @@ public class AutoRed_Premiere extends LinearOpMode {
         int state = pipeline.position;
         robot.setXY(0, autoConstant.start_position);//start position
         stretch(state);
-        sleep(900);
+        sleep(800);
         put();
         fold();
         int i;
         for (i = 1; i <= 10; i++) {
-
             if (robot.runtime.seconds() < 26) {
                 robot.Suck(0.85);
                 switch (i) {
@@ -95,56 +91,56 @@ public class AutoRed_Premiere extends LinearOpMode {
                     case 5:
                         five();
                         break;
+                    case 6:
+                        six();
+                        break;
                     default:
                         Default(i);
                         break;
                 }
                 robot.Suck(-1);
-                sleep(200);
-
                 if (robot.distance.getDistance(DistanceUnit.CM) < 15 && robot.runtime.seconds() < 27.5) {
                     back();
                     fold();
                 }
             }
         }
-        if (robot.getY() < autoConstant.warehouse_position)
-            moveY(autoConstant.warehouse_position, 0);
+        moveY(autoConstant.warehouse_position + 15);
         sleep(5000);
     }
 
     void turn(double deg) {
         int tar = (int) (deg / 180 * -4300);
-        robot.setTurn(tar, 0.27);
+        robot.setTurn(tar, 0.5);
     }
 
     void one() {
-        moveY(autoConstant.warehouse_position, -2);
+        moveY(autoConstant.warehouse_position);
         suck(0);
     }
 
     void two() {
-        moveY(autoConstant.warehouse_position + 20, -2);
+        moveY(autoConstant.warehouse_position + 20);
         suck(10);
     }
 
     void three() {
-        moveY(autoConstant.warehouse_position + 20, -2);
+        moveY(autoConstant.warehouse_position + 20);
         suck(20);
     }
 
     void four() {
-        moveY(autoConstant.warehouse_position, -2);
+        moveY(autoConstant.warehouse_position);
         timelapse = robot.runtime.milliseconds();
         while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1750) {
             robot.Odometry();
-            robot.move(0, 0.22, (getHeading() - 35) * 0.025);
+            robot.move(0, 0.22, (getHeading() - (robot.bluseside ? -35 : 35)) * 0.025);
         }
         robot.move(0, 0, 0);
     }
 
     void five() {
-        moveY(autoConstant.warehouse_position + 25, 0);
+        moveY(autoConstant.warehouse_position + 25);
         timelapse = robot.runtime.milliseconds();
         suck(30);
         while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1500) {
@@ -154,33 +150,30 @@ public class AutoRed_Premiere extends LinearOpMode {
         robot.move(0, 0, 0);
     }
 
-    void Default(int i) {
-        moveY(autoConstant.warehouse_position + 30, 0);
+    void six() {
+        moveY(autoConstant.warehouse_position + 30);
         timelapse = robot.runtime.milliseconds();
-        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1250) {
+        suck(30);
+        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1750) {
             robot.Odometry();
-            robot.move(0, 0.3, (getHeading() - (i % 3 + 1) * 10) * 0.025);
+            robot.move(0, 0.22, (getHeading()) * 0.025);
         }
         robot.move(0, 0, 0);
     }
 
+    void Default(int i) {
+        moveY(autoConstant.warehouse_position + 30);
+        suck(10 * (i % 2) + 10);
+    }
 
-    public void moveY(double y, int heading) {
+
+    public void moveY(double y) {
         double ypower = 0.95;
-        double slowpower = 0.25;
-        double downpower;
-        double sy = robot.getY();
         double dis = Math.abs(robot.getY() - y);
-        double slowdis = dis * 0.6;
         while (dis > 3.5 && opModeIsActive()) {
             robot.Odometry();
             dis = Math.abs(robot.getY() - y);
-            double slow = Math.abs(robot.getY() - sy) - slowdis;
-            if (slow <= 1)
-                downpower = ypower;
-            else
-                downpower = Range.clip(0.0000001 / (slow / Math.abs(y - slowdis)) + slowpower, slowpower, ypower);
-            robot.move(0.15, downpower * (y - robot.getY() > 0 ? 1 : -1), Range.clip((getHeading() - heading) * 0.06, -0.25, 0.25));
+            robot.move(0.15 * (robot.bluseside ? -1 : 1), -MyMath.distanceToPower((robot.getY() - y) / 50) * ypower, (getHeading() - (robot.bluseside ? 7 : -7)) * 0.07);
             telemetry.addData("y", robot.getY());
             telemetry.update();
         }
@@ -189,10 +182,14 @@ public class AutoRed_Premiere extends LinearOpMode {
     }
 
     void suck(int heading) {
+        if (robot.bluseside)
+            heading *= -1;
         timelapse = robot.runtime.milliseconds();
-        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 2000) {
+        while (opModeIsActive() && robot.runtime.milliseconds() - timelapse < 50)
+            robot.move(0, 0, 0);
+        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1750) {
             robot.Odometry();
-            robot.move(0, 0.19, (getHeading() - heading) * 0.025);
+            robot.move(0, 0.22, (getHeading() - heading) * 0.025);
         }
         robot.move(0, 0, 0);
 
@@ -222,62 +219,71 @@ public class AutoRed_Premiere extends LinearOpMode {
     }
 
     public void stretch() {
-        int angle = autoConstant.top_angle;
-        int rail = autoConstant.top_rail;
-        robot.setAngle(angle, 0.4);
-        robot.setRail(rail, 1);
-        sleep(100);
-        turn(autoConstant.turn_degree - 5);
+        new Thread(() -> {
+            int angle = autoConstant.top_angle;
+            int rail = autoConstant.top_rail;
+            turn(autoConstant.turn_degree - 5);
+            robot.setAngle(angle, 0.7);
+            sleep(50);
+            robot.setRail(rail, 1);
+        }).start();
     }
 
     void back() {
         //back to white strip
-        while (opModeIsActive() && distance.getDistance(DistanceUnit.CM) > 12) {
+        if (robot.distance.getDistance(DistanceUnit.CM) < 15)
             robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-            double p = (distance.getDistance(DistanceUnit.CM) - 12) * 0.09 + 0.15;
-            if (distance.getDistance(DistanceUnit.CM) < 25)
-                robot.move(Range.clip(p, 0.2, 0.7), Range.clip(-1 + p, -0.8, -0.5), 0);
-            else
-                robot.move(0.8, -0.5, Range.clip(getHeading() * 0.04, -0.3, 0.3));
+        while (opModeIsActive() && distance.getDistance(DistanceUnit.CM) > 12) {
+            robot.move(robot.bluseside ? -0.6 : 0.6, -0.4, Range.clip((getHeading() - (robot.bluseside ? -7 : 7)) * 0.04, -0.3, 0.3));
             telemetry.addLine("back to white strip");
             telemetry.update();
         }
-        robot.move(0, 0, 0);
+        timelapse = robot.runtime.milliseconds();
+        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 500)
+            robot.move(robot.bluseside ? -1 : 1, 0, 0);
+        if (robot.distance.getDistance(DistanceUnit.CM) > 15)
+            return;
         stretch();
         //readjust
         robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
-        while (opModeIsActive() && tube.getDistance(DistanceUnit.CM) > 6) {
+        while (opModeIsActive() && (robot.getY() > autoConstant.warehouse_position || tube.getDistance(DistanceUnit.CM) > 6)) {
             robot.Odometry();
-            robot.move(0.25, -0.9, (getHeading() - 15) * 0.08);
+            robot.move(robot.bluseside ? -0.2 : 0.2, -0.9, Range.clip((getHeading() - (robot.bluseside ? -7 : 7)) * 0.04, -0.3, 0.3));
         }
         robot.move(0, 0, 0);
-        robot.setY(115);
+        robot.setY(122);
         robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.DARK_RED);
         //back to put
-        while (opModeIsActive() && robot.getY() > autoConstant.start_position + 5) {
+        double time = robot.runtime.milliseconds();
+        while (opModeIsActive() && robot.runtime.milliseconds() - time < 500) {
             robot.Odometry();
-            robot.move(0.05, Range.clip(-1 * (robot.getY() - autoConstant.start_position - 15) / 35, -1, -0.2), getHeading() * 0.025);
-            if (robot.getY() < autoConstant.start_position + 20) robot.setBasket(true);
+            robot.move(robot.bluseside ? -0.05 : 0.05, MyMath.distanceToPower((autoConstant.start_position - robot.getY()) / 100), getHeading() * 0.015);
+            if (robot.getY() < autoConstant.start_position + 15) robot.setBasket(true);
+            else time = robot.runtime.milliseconds();
             telemetry.addLine("back to put");
             telemetry.update();
         }
-        robot.move(0, 0, 0);
-        sleep(300);
         robot.setBasket(false);
+        while (opModeIsActive() && Math.abs(getHeading()) > 0) {
+            robot.Odometry();
+            robot.move(0, 0, Range.clip(getHeading() * 0.5, -0.5, 0.5));
+        }
         robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
     }
 
     public void fold() {
-        turn(0);
-        robot.setRail(0, 1);
-        robot.setAngle(0, 0.2);
+        new Thread(() -> {
+            while (opModeIsActive() && robot.rail.getCurrentPosition() > 500)
+                robot.setRail(0, 1);
+            robot.setAngle(0, 1);
+            turn(0);
+        }).start();
     }
 
     public void put() {
         robot.setBasket(true);
         sleep(500);
         robot.setBasket(false);
-        sleep(150);
     }
 
     int getHeading() {

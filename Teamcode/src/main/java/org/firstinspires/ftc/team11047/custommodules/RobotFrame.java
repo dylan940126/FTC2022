@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.team11047.custommodules;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public abstract class RobotFrame extends Chassis {
     public DcMotor raise, extend, intake, turn;
     public Servo container, ship;
-    public CRServo spinner;
+    public Servo spinner;
     public DistanceSensor object_detector;
     private boolean last_detect = false;
     private double detect_time = 0;
@@ -21,24 +20,24 @@ public abstract class RobotFrame extends Chassis {
 
     public void initFrame() {
         initChassis();
-        container = hardwareMap.servo.get("lifter");
+        container = hardwareMap.servo.get("basket");
         noPour();
-        intake = hardwareMap.dcMotor.get("intake");
+        intake = hardwareMap.dcMotor.get("suck");
 //        intake.setDirection(DcMotor.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        turn = hardwareMap.dcMotor.get("btm");
+        turn = hardwareMap.dcMotor.get("turn");
         turn.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turn.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turn.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spinner = hardwareMap.crservo.get("spinner");
-        ship = hardwareMap.servo.get("ship");
+        spinner = hardwareMap.servo.get("duck");
+        ship = hardwareMap.servo.get("teammark");
 //        ship.setDirection(Servo.Direction.REVERSE);
         ship.scaleRange(0, 0.94);
-        object_detector = hardwareMap.get(DistanceSensor.class, "objdetect");
-        raise = hardwareMap.dcMotor.get("la");
+        object_detector = hardwareMap.get(DistanceSensor.class, "dis");
+        raise = hardwareMap.dcMotor.get("angle");
         raise.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         raise.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        extend = hardwareMap.dcMotor.get("extend");
+        extend = hardwareMap.dcMotor.get("rail");
         extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -145,15 +144,15 @@ public abstract class RobotFrame extends Chassis {
     }
 
     public void setSpinnerRed() {
-        spinner.setPower(-duck_power);
+        spinner.setPosition((1 - duck_power) / 2);
     }
 
     public void setSpinnerBlue() {
-        spinner.setPower(duck_power);
+        spinner.setPosition((1 + duck_power) / 2);
     }
 
     public void setSpinnerStop() {
-        spinner.setPower(0);
+        spinner.setPosition(0.5);
     }
 
     public void resetRaise() {
