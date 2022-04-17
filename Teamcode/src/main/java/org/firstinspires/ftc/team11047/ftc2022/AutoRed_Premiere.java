@@ -130,18 +130,35 @@ public class AutoRed_Premiere extends LinearOpMode {
     }
 
     void four() {
-        moveY(autoConstant.warehouse_position + 20);
-        suck(35);
+        moveY(autoConstant.warehouse_position);
+        timelapse = robot.runtime.milliseconds();
+        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1750) {
+            robot.Odometry();
+            robot.move(0, 0.22, (getHeading() - (robot.bluseside ? -35 : 35)) * 0.025);
+        }
+        robot.move(0, 0, 0);
     }
 
     void five() {
         moveY(autoConstant.warehouse_position + 25);
+        timelapse = robot.runtime.milliseconds();
         suck(30);
+        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1500) {
+            robot.Odometry();
+            robot.move(0, 0.22, (getHeading()) * 0.025);
+        }
+        robot.move(0, 0, 0);
     }
 
     void six() {
         moveY(autoConstant.warehouse_position + 30);
-        suck(35);
+        timelapse = robot.runtime.milliseconds();
+        suck(30);
+        while (opModeIsActive() && robot.distance.getDistance(DistanceUnit.CM) > 15 && robot.runtime.milliseconds() - timelapse < 1750) {
+            robot.Odometry();
+            robot.move(0, 0.22, (getHeading()) * 0.025);
+        }
+        robot.move(0, 0, 0);
     }
 
     void Default(int i) {
@@ -206,7 +223,7 @@ public class AutoRed_Premiere extends LinearOpMode {
             int angle = autoConstant.top_angle;
             int rail = autoConstant.top_rail;
             turn(autoConstant.turn_degree - 5);
-            robot.setAngle(angle, 0.4);
+            robot.setAngle(angle, 0.7);
             sleep(50);
             robot.setRail(rail, 1);
         }).start();

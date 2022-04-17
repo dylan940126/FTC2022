@@ -171,7 +171,6 @@ public class Pomelo {
     public void setRail(int pos, double power) {
         rail.setTargetPosition(pos);
         rail.setPower(power);
-        rail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setTurn(int pos, double power) {
