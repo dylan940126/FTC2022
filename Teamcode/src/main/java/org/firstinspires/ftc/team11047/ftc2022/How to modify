@@ -1,0 +1,12 @@
+When you read these, you may face with some problems.
+Here are some tips for you to modify the program "PROPERLY."
+
+1.Check if the problem is happening again and again.
+    "Yes." Then find out the most critical part of the problem.
+    "No." Check your wire, hub, positioning, etc.
+2.NEVER modify the program once it does not go well.
+    There are many reasons why the robot does not go well.
+3.Only modify the parameters in the "Auto_Constant".
+    Modify the part of the problem that can be easily observed.
+4.IF YOU INSIST ON MODIFYING THE PATH, you should discuss with your teammates and coach.
+    Modify one part at one time, and "ONLY" modify the part that are mark with "V".
