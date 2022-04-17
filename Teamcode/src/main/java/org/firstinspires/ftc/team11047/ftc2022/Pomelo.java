@@ -25,7 +25,7 @@ public class Pomelo {
 
     DistanceSensor distance = null;
     RevBlinkinLedDriver led = null;
-    public boolean bluseside = true;
+    public boolean bluseside = false;
 
     public ElapsedTime runtime = new ElapsedTime();
     IMU imu;
@@ -171,6 +171,7 @@ public class Pomelo {
     public void setRail(int pos, double power) {
         rail.setTargetPosition(pos);
         rail.setPower(power);
+        rail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setTurn(int pos, double power) {
