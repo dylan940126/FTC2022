@@ -52,13 +52,13 @@ public class TeleRed extends OpMode {
         if (tmp && !lastifsuck)
             ifsuck = !ifsuck;
         lastifsuck = tmp;
-        if (gamepad1.left_bumper || robot.distance.getDistance(DistanceUnit.CM) < 10)
+        if (gamepad1.left_bumper || robot.distance.getDistance(DistanceUnit.CM) < 13)
             robot.Suck(-1);
         else if (ifsuck)
             robot.Suck(0.75);
         else
             robot.Suck(0);
-        if (robot.distance.getDistance(DistanceUnit.CM) < 10)
+        if (robot.distance.getDistance(DistanceUnit.CM) < 13)
             robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         else
             robot.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
@@ -82,7 +82,7 @@ public class TeleRed extends OpMode {
             ang += 100;
         lastifturn = tmp;
         robot.turn.setTargetPosition(robot.turn.getTargetPosition() + ang);
-        robot.turn.setPower(0.35);
+        robot.turn.setPower(0.5);
 
         //teammark
         tmp = gamepad2.dpad_up;
@@ -142,8 +142,8 @@ public class TeleRed extends OpMode {
                 railholdMode = true;
             if (gamepad2.left_bumper) {
                 robot.rail.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.setAngle(550, 0.4);
-                robot.setRail(1950, 0.8);
+                robot.setAngle(550, 0.8);
+                robot.setRail(1900, 0.8);
             }
             if (gamepad2.right_bumper) {
                 robot.rail.setMode(DcMotor.RunMode.RUN_TO_POSITION);

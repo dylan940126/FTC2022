@@ -54,7 +54,7 @@ public class TeleControl1 extends Robot {
                 setExtendSpeed(-gamepad1.left_stick_y * 0.3);
             } else if (gamepad1.left_bumper) {
                 height = 4;
-                d_forward = MyMath.distanceToPower(hubPipeline.getX()) / 30;
+                d_forward = MyMath.distanceToPowerAndCut(hubPipeline.getX()) / 30;
                 setExtendSpeed(1);
             } else if (gamepad1.right_bumper || height == 0)
                 height = 0;

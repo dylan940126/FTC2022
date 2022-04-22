@@ -82,7 +82,7 @@ public class TeleBlue extends OpMode {
             ang += 100;
         lastifturn = tmp;
         robot.turn.setTargetPosition(robot.turn.getTargetPosition() + ang);
-        robot.turn.setPower(0.35);
+        robot.turn.setPower(0.5);
 
         //teammark
         tmp = gamepad2.dpad_up;

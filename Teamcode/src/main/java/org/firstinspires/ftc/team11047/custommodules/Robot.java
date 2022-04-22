@@ -53,7 +53,6 @@ public abstract class Robot extends RobotFrame {
 
             @Override
             public void onError(int errorCode) {
-
             }
         });
     }
