@@ -32,7 +32,7 @@ public abstract class Chassis extends LinearOpMode {
         gyro.calibrate();
         last_direction = gyro.getHeading();
         last_refresh_time = getRuntime();
-        while (!gyro.isCalibrating()) ;
+        while (!gyro.isCalibrating()) idle();
     }
 
     public void drive(double right_speed, double forward_speed, double turn_speed, double speed) {
