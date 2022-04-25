@@ -2,7 +2,7 @@ package org.firstinspires.ftc.team11047.ftc2022;
 
 public class Auto_Constant {
     //position(y unit:CM)
-    double start_position = 80;
+    double start_position = 60;
     double warehouse_position = 135;
     double beforeWhite_position = 115;
 

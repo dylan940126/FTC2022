@@ -37,7 +37,7 @@ public class RedZone extends Robot {
             for (int check = 0; check < 20; ++check) {
                 while (opModeIsActive() && (Math.abs(hubPipeline.getX()) > 20 || !isPourable()))
                     drive(0.1 * Math.abs(hubPipeline.getX()) * red, hubPipeline.getX() * red, 0,
-                            1.1 * Math.abs(MyMath.distanceToPower(hubPipeline.getX()) / 30));
+                            1.1 * Math.abs(MyMath.distanceToPowerAndCut(hubPipeline.getX()) / 30));
             }
             drive(0, 0, 0, 0);
             pour();
@@ -48,7 +48,7 @@ public class RedZone extends Robot {
 //            going to collect
             while (opModeIsActive() && current_y < last_y) {
                 drive(0.1 * red, 1, -0.1 * red,
-                        MyMath.distanceToPower(last_y - current_y) / 4);
+                        MyMath.distanceToPowerAndCut(last_y - current_y) / 4);
                 setHeight(0);
                 collect();
             }

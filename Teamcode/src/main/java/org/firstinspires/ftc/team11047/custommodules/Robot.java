@@ -53,7 +53,6 @@ public abstract class Robot extends RobotFrame {
 
             @Override
             public void onError(int errorCode) {
-
             }
         });
     }
@@ -74,6 +73,6 @@ public abstract class Robot extends RobotFrame {
     }
 
     public void waitForCamera() {
-        while (!isStopRequested() && !camera_ready) ;
+        while (!isStopRequested() && !camera_ready) idle();
     }
 }

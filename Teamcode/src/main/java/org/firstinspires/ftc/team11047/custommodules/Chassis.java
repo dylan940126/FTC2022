@@ -11,14 +11,14 @@ public abstract class Chassis extends LinearOpMode {
     public Wheel lf, lb, rf, rb;
     public ModernRoboticsI2cGyro gyro;
 
-    public double max_accelerate = 50,
+    public static double max_accelerate = 80,
             terminate_power = 0,
             code_per_inch_right = 55,
             code_per_inch_forward = 42.6,
             turn_weight = 10,
             trace_kp = 0.2,
             turn_k = 1.06825;
-    public int buffer_size = 2;
+    public static int buffer_size = 2;
     private double last_refresh_time, loop_time = 0;
     public double current_x, current_y, current_direction, target_x, target_y, target_direction;
     private int last_direction;
@@ -32,7 +32,7 @@ public abstract class Chassis extends LinearOpMode {
         gyro.calibrate();
         last_direction = gyro.getHeading();
         last_refresh_time = getRuntime();
-        while (!gyro.isCalibrating()) ;
+        while (!gyro.isCalibrating()) idle();
     }
 
     public void drive(double right_speed, double forward_speed, double turn_speed, double speed) {
@@ -44,10 +44,14 @@ public abstract class Chassis extends LinearOpMode {
             speed = 1;
         else if (speed < 0)
             speed = 0;
-        double k = speed / Math.max(Math.abs(forwardLeft_Power),
-                Math.max(Math.abs(rearLeft_Power),
-                        Math.max(Math.abs(forwardRight_Power),
-                                Math.abs(rearRight_Power))));
+        double k;
+        if (forwardLeft_Power == 0 && forwardRight_Power == 0 && rearLeft_Power == 0 && rearRight_Power == 0)
+            k = 0;
+        else
+            k = speed / Math.max(Math.abs(forwardLeft_Power),
+                    Math.max(Math.abs(rearLeft_Power),
+                            Math.max(Math.abs(forwardRight_Power),
+                                    Math.abs(rearRight_Power))));
         lf.setPower(forwardLeft_Power * k);
         lb.setPower(rearLeft_Power * k);
         rf.setPower(forwardRight_Power * k);
@@ -132,6 +136,9 @@ public abstract class Chassis extends LinearOpMode {
         telemetry.addData("currentX", current_x);
         telemetry.addData("currentY", current_y);
         telemetry.addData("currentDirection", current_direction);
+        telemetry.addData("targetX", target_x);
+        telemetry.addData("targetY", target_y);
+        telemetry.addData("targetDirection", target_direction);
     }
 
     public class Wheel {

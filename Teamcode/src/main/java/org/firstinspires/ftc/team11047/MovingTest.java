@@ -3,7 +3,6 @@ package org.firstinspires.ftc.team11047;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.team11047.custommodules.MyMath;
 import org.firstinspires.ftc.team11047.custommodules.Robot;
 
 @TeleOp
@@ -24,8 +23,7 @@ public class MovingTest extends Robot {
             }
             telemetry.addData("count", hubPipeline.getX());
             if (gamepad1.a) {
-                drive(0.1 * Math.abs(hubPipeline.getX()) * -1, hubPipeline.getX() * -1, 0,
-                        1.1 * Math.abs(MyMath.distanceToPower(hubPipeline.getX()) / 30));
+                move_to(20, 20, Math.toRadians(90), 1);
             } else {
                 drive(x, y, z, Math.max(Math.max(Math.abs(x), Math.abs(y)), Math.abs(z)));
             }
